@@ -1,0 +1,305 @@
+<script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" data-auto-replace-svg="nest"></script>
+
+
+<input-filter nameFilter="selectModalControleTransferencia" titulo="Filtre Por Setor" width="250px" url="listar_materiais_select" id="selectFilterTransferenciaSetor"></input-filter>
+
+
+<style>
+    .divSelectFilter {
+        position: relative;
+    }
+
+    .divSelectFilter i {
+        position: absolute;
+        top: 3px;
+        right: 10px;
+        color: #807c7c;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .divSelectFilter i.active {
+        transform: rotate(180deg);
+        top: 9px;
+    }
+
+
+
+    .divSelectFilter input {
+        border: 1px solid #c2c2c2;
+        outline: none;
+        padding: 0 30px 0 10px;
+        height: 30px;
+        font-size: 11px;
+        position: relative;
+        font-weight: 500;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+
+
+    .divSelectFilter .corpoFiltroInput {
+        max-height: 150px;
+        box-shadow: 2px 2px 10px #c2c2c2;
+        position: relative;
+        margin: 5px 0 0 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 10000;
+    }
+
+    .divSelectFilter .corpoFiltroInput ul {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    .divSelectFilter .corpoFiltroInput ul li {
+        list-style: none;
+        font-size: 13;
+        font-weight: 500;
+        color: #2b2828;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #c3c3c3;
+        padding: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .divSelectFilter .corpoFiltroInput ul li.setado {
+        background: #0080004d;
+    }
+
+    .divSelectFilter .corpoFiltroInput ul li.ocultado {
+        display: none;
+    }
+
+    .divSelectFilter .corpoFiltroInput ul li.desocultado {
+        display: '';
+    }
+
+
+    .divSelectFilter .corpoFiltroInput ul li[value="Nada"] {
+        background: #0080004d;
+    }
+
+
+    .divSelectFilter .corpoFiltroInput ul li input {
+        width: calc(100% - 10px);
+        display: block;
+        height: 25px;
+        background: transparent;
+        color: green;
+        cursor: pointer;
+        border: none;
+    }
+</style>
+<script>
+    window.addEventListener("load", function() {
+        selectFilter();
+    });
+
+    function selectFilter() {
+        var selec = document.querySelectorAll('input-filter');
+        let CountArrown = 0;
+        let CountUp = 0;
+        for (let i = 0; i < selec.length; i++) {
+            let Wid = selec[i].getAttribute("width");
+            let heig = selec[i].getAttribute("heigth");
+            let Url = selec[i].getAttribute("Url");
+            var nameFilter = selec[i].getAttribute("nameFilter");
+            var ID = selec[i].getAttribute("id");
+            var Titulo = selec[i].getAttribute("titulo");
+            var appendFilter = document.querySelector("input-filter[nameFilter='" + nameFilter + "']").parentElement;
+            var Body = document.querySelector("body");
+            var VerifyCreated = document.querySelector("div[nameFilter='" + nameFilter + "']");
+
+            if (VerifyCreated === null || VerifyCreated === undefined) {
+                let CorpoSelect = document.createElement("div");
+                CorpoSelect.setAttribute("nameFilter", nameFilter);
+                CorpoSelect.classList.add("divSelectFilter");
+                CorpoSelect.style.width = Wid;
+                appendFilter.appendChild(CorpoSelect);
+                let CorpoFilterInput = document.createElement("input");
+                CorpoFilterInput.style.width = Wid;
+                CorpoFilterInput.style.height = heig
+                CorpoFilterInput.placeholder = Titulo;
+                CorpoFilterInput.classList.add("inputFilter");
+                CorpoFilterInput.setAttribute("Url", Url)
+                CorpoFilterInput.setAttribute("valor", "")
+                CorpoFilterInput.setAttribute("id", ID)
+                CorpoFilterInput.focus();
+                let Seta = document.createElement("i");
+                Seta.classList.add("fa");
+                Seta.classList.add("fa-sort-down");
+                CorpoFilterInput.onclick = function() {
+                    this.value = "";
+                    CountArrown = 0;
+                    CountUp = 0;
+                    var HeigtBody = ``;
+                    var nameFilter = this.parentElement.getAttribute("nameFilter");
+                    var UrlInp = this.getAttribute("Url");
+                    var CorpoSelectClick = document.querySelector("div[nameFilter='" + nameFilter + "']")
+                    var CorpoSecundFiltere = document.querySelector("div[nameFilter='" + nameFilter + "'] .corpoFiltroInput");
+                    if (CorpoSecundFiltere != null || CorpoSecundFiltere != undefined) {
+                        Seta.classList.remove("active");
+                        CorpoSecundFiltere.remove();
+                    } else {
+                        Seta.classList.add("active");
+                        if (heig === null) {
+                            HeigtBody = `150px`;
+                        } else {
+                            HeigtBody = heig;
+                        }
+                        let CorpoSecundFilter = document.createElement("div");
+                        CorpoSecundFilter.classList.add("corpoFiltroInput");
+                        CorpoSecundFilter.setAttribute("nameFilterBody", nameFilter);
+                        CorpoSecundFilter.style = `width:${Wid};height:${HeigtBody}`;
+                        CorpoSelectClick.appendChild(CorpoSecundFilter);
+                        restBody(Url, CorpoSecundFilter, CorpoFilterInput);
+
+
+                    }
+                }
+                CorpoFilterInput.onkeydown = function(e) {
+                    var nameFilter = this.parentElement.getAttribute("nameFilter");
+                    var CorpoSecundFiltere = document.querySelector("div[nameFilter='" + nameFilter + "'] .corpoFiltroInput");
+                    if (e.key === 'ArrowDown') {
+                        if (CorpoSecundFiltere !== null) {
+                            let Scroll = CorpoSecundFiltere.scrollTop;
+                            ++CountArrown;
+                            let LI = CorpoSecundFiltere.querySelectorAll("ul li.desculpado");
+                            let CountLI = LI.length;
+                            let PositionLI = CountLI - CountLI + CountArrown - CountUp - 1;
+                            let PositionPreviLI = PositionLI - 1;
+                            if ((PositionLI + 1) <= (CountLI)) {
+                                if (PositionLI > 0) {
+                                    LI[PositionPreviLI].classList.remove("Setado");
+                                }
+                                LI[PositionLI].classList.add("Setado");
+                                CorpoSecundFiltere.scrollTop = (CorpoSecundFiltere.scrollHeight - CorpoSecundFiltere.clientHeight - 1) / ((CountLI - 1) / (PositionLI));
+                            } else {
+                                CountArrown = 0;
+                                CountUp = 0;
+                                let PositionLI = CountLI - CountLI + CountArrown;
+                                let PositionPreviLI = PositionLI - 1 + CountLI;
+                                LI[PositionPreviLI].classList.remove("Setado");
+                                LI[PositionLI].classList.add("Setado");
+                                CountArrown = 1;
+                                CorpoSecundFiltere.scrollTop = 0;
+                            }
+
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        if (CorpoSecundFiltere !== null) {
+                            ++CountUp;
+                            let LI = CorpoSecundFiltere.querySelectorAll("ul li.desculpado");
+                            let CountLI = LI.length;
+                            let PositionUpLI = CountLI - CountLI + CountArrown - CountUp - 1;
+                            let PositionUpPreviLI = PositionUpLI + 1;
+                            if ((PositionUpLI + 1) >= (CountLI - CountLI + 1)) {
+                                if (PositionUpLI >= 0) {
+                                    LI[PositionUpPreviLI].classList.remove("Setado");
+                                }
+                                LI[PositionUpLI].classList.add("Setado");
+                                CorpoSecundFiltere.scrollTop = (CorpoSecundFiltere.scrollHeight - CorpoSecundFiltere.clientHeight - 1) / ((CountLI - 1) / (PositionUpLI));
+                            } else {
+                                CountArrown = 1;
+                                CountUp = 0;
+                                CorpoSecundFiltere.scrollTop = 0;
+                            }
+
+                        }
+                    } else if (e.key === 'Enter') {
+                        if (CorpoSecundFiltere !== null) {
+                            var ResultSetado = CorpoSecundFiltere.querySelector('.Setado');
+                            CorpoFilterInput.value = ResultSetado.getAttribute("texto");
+                            CorpoFilterInput.setAttribute("valor", ResultSetado.getAttribute("value"));
+                            CorpoFilterInput.value = ResultSetado.getAttribute("texto");
+                            Seta.classList.remove("active");
+                            CorpoSecundFiltere.remove();
+                        }
+                    }
+                }
+                CorpoFilterInput.onkeyup = function(e) {
+                    var nameFilter = this.parentElement.getAttribute("nameFilter");
+                    var CorpoSecundFiltere = document.querySelector("div[nameFilter='" + nameFilter + "'] .corpoFiltroInput");
+                    filterSelect(this.value, nameFilter);
+                }
+
+                CorpoSelect.appendChild(CorpoFilterInput);
+                CorpoSelect.appendChild(Seta);
+                selec[i].remove();
+
+                function restBody(Url, CorpoSecundFilter, CorpoFilterInput) {
+                    if (Url !== '') {
+                        const xh = new XMLHttpRequest();
+                        xh.open("GET", Url + "?Setor=1");
+                        xh.onload = function() {
+                            let Json = JSON.parse(xh.responseText);
+                            let UlCorpo = document.createElement("ul");
+                            CorpoSecundFilter.appendChild(UlCorpo);
+                            for (let J of Json) {
+                                let LICorpo = document.createElement("li");
+                                LICorpo.setAttribute("value", J.Cod);
+                                LICorpo.setAttribute("texto", J.Material);
+                                LICorpo.classList.add("desculpado");
+                                LICorpo.innerHTML = `${J.Material}`;
+                                LICorpo.onclick = function() {
+                                    CorpoFilterInput.value = this.getAttribute("texto");
+                                    CorpoFilterInput.setAttribute("valor", this.getAttribute("value"));
+                                    CorpoFilterInput.value = this.getAttribute("texto");
+                                    Seta.classList.remove("active");
+                                    CorpoSecundFilter.remove();
+                                }
+                                UlCorpo.appendChild(LICorpo);
+                            }
+                            let LICorpo = document.createElement("li");
+                            LICorpo.setAttribute("value", "Nada");
+                            LICorpo.setAttribute("licadastro", "");
+                            LICorpo.classList.add("ocultado");
+                            LICorpo.innerHTML += `<input type="button" value="Adicionar" />`
+                            UlCorpo.appendChild(LICorpo);
+                        }
+                        xh.send();
+                    } else {
+                        alert("Filtro Sem URL , fale com o Administrador....")
+                        CorpoSelect.remove();
+                    }
+                }
+
+                function filterSelect(Textt, nameFilter) {
+                    var Text = Textt.toLowerCase();
+                    var CorpoSecundFiltere = document.querySelectorAll("div[nameFilter='" + nameFilter + "'] .corpoFiltroInput ul li");
+                    CorpoSecundFiltere.forEach(options => {
+                        let label = options.getAttribute("texto");
+                        let addLi = document.querySelector("div[nameFilter='" + nameFilter + "'] .corpoFiltroInput ul li[licadastro]");
+                        if (label !== null) {
+                            if (label.toLowerCase().trim().indexOf(Text.trim()) !== -1) {
+                                options.classList.remove("ocultado");
+                                options.classList.add("desculpado");
+                            } else {
+                                var Ocultados = document.querySelectorAll("div[nameFilter='" + nameFilter + "'] .corpoFiltroInput ul li.ocultado");
+                                if (Ocultados.length === CorpoSecundFiltere.length - 1) {
+                                    addLi.classList.remove("ocultado");
+                                    addLi.classList.add("desculpado")
+                                } else {
+                                    addLi.classList.add("ocultado");
+                                    addLi.classList.remove("desculpado")
+                                }
+                                options.classList.add("ocultado");
+                                options.classList.remove("desculpado");
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    }
+</script>
